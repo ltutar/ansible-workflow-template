@@ -1,17 +1,4 @@
 ---
-- name: "subscription-manager refresh"
-  shell: "subscription-manager refresh"
-  when:
-    - ansible_distribution == "RedHat"
-
-- name: "Enable additional rhel repos"
-  rhsm_repository:
-    name:
-      - rhel-7-server-rpms
-      - rhel-7-server-extras-rpms
-  when:
-    - ansible_distribution == "RedHat"
-
 # Use python2 for yum module, as python3 i.c.w. ansible does not support this well
 - name: "Use python2 for yum modules"
   set_fact: ansible_python_interpreter=/usr/bin/python2
@@ -64,22 +51,6 @@
       - wget
       - nload
       - net-tools
-  environment:
-    http_proxy: "{{ proxy_server }}"
-    https_proxy: "{{ proxy_server }}"
-
-- name: "Use python3"
-  set_fact: ansible_python_interpreter=/usr/bin/python3
-
-- name: "Install pip packages"
-  pip:
-    name: "{{ packages }}"
-    executable: pip3
-  vars:
-    packages:
-      - cryptography == {{ python_cryptography_version }}
-      - psycopg2-binary == {{ python_psycopg2_binary_version }}
-      - docker-compose == {{ docker_compose_version }}
   environment:
     http_proxy: "{{ proxy_server }}"
     https_proxy: "{{ proxy_server }}"
