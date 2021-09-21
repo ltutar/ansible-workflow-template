@@ -1,0 +1,21 @@
+[postgres_group]
+postgres ansible_host=192.168.130.21
+
+
+# Group 'multi' with all groups
+[multi:children]
+postgres_group
+
+# Variables that will be applied to all servers
+[multi:vars]
+ansible_port=22
+ansible_user=vagrant
+ansible_private_key_file=~/.vagrant.d/insecure_private_key
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+
+proxy_server=""
+logstash_hosts="192.168.130.29:5044"
+private_docker_registry_hostname="192.168.130.23"
+nginx_ssl=True
+ssl_offloading=False

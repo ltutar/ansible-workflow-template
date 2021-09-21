@@ -1,0 +1,12 @@
+.vagrant
+*vault_password*
+*vodafoneziggo_ldap_password*
+Pip*
+images/~*
+**/.DS_Store
+jfrog-artifactory-oss-*-linux.tar.gz
+repositories
+repositories.zip
+.vscode
+.scannerwork
+

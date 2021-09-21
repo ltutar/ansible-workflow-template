@@ -1,0 +1,51 @@
+# https://hub.docker.com/_/nginx
+nginx_version: "nginx:1.21.1"
+
+# https://hub.docker.com/r/aquasec/trivy/tags?page=1&ordering=last_updated
+trivy_docker_image_tag: "aquasec/trivy:0.19.2"
+run_trivy: "false"
+
+# https://centos.pkgs.org/7/docker-ce-stable-x86_64/
+# https://pkgs.org/search/?q=docker-ce
+docker_ce_version: "20.10.8-3.el7"
+
+# https://pkgs.org/search/?q=docker-ce-cli
+docker_ce_cli_version: "20.10.8-3.el7"
+
+# https://pkgs.org/download/containerd.io
+containerd_io_version: "1.4.9-3.1.el7"
+
+# https://pkgs.org/search/?q=git
+git_version: "2.30.1-1.ep7"
+
+# https://docs.docker.com/compose/release-notes/
+docker_compose_version: "1.29.2"
+
+# https://pypi.org/project/python-gitlab/#history
+# https://docs.ansible.com/ansible/latest/modules/gitlab_project_module.html
+python_gitlab_version: "2.10.0"
+
+# https://pypi.org/project/cryptography/#history
+python_cryptography_version: "3.3.2"
+
+# https://pypi.org/project/psycopg2-binary/#history
+python_psycopg2_binary_version: "2.8.6"
+
+filebeat_version: "7.6.2"
+
+docker_data_dir: "/data/docker"
+docker_user: "docker"
+docker_group: "docker"
+
+disk_vg: "data"
+disk_lv: "data"
+disk_pvs: "/dev/sdb"
+disk_dev: "/dev/data/data"
+disk_mount: "/dev/mapper/data-data"
+
+cdaas_banner: |
+ .
+ .
+ .    ██████╗  ██████╗ ██╗  ████████╗
+ .
+ 

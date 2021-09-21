@@ -1,0 +1,85 @@
+---
+- name: "subscription-manager refresh"
+  shell: "subscription-manager refresh"
+  when:
+    - ansible_distribution == "RedHat"
+
+- name: "Enable additional rhel repos"
+  rhsm_repository:
+    name:
+      - rhel-7-server-rpms
+      - rhel-7-server-extras-rpms
+  when:
+    - ansible_distribution == "RedHat"
+
+# Use python2 for yum module, as python3 i.c.w. ansible does not support this well
+- name: "Use python2 for yum modules"
+  set_fact: ansible_python_interpreter=/usr/bin/python2
+
+- name: "Add docker-ce stable repo"
+  yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable Repo
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    gpgcheck: yes
+  become: true
+
+- name: "Install additional yum repos"
+  yum:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+      - https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.8-1.x86_64.rpm
+  environment:
+    http_proxy: "{{ proxy_server }}"
+    https_proxy: "{{ proxy_server }}"
+
+# https://docs.docker.com/engine/install/centos/
+- name: "Install yum packages"
+  yum:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - yum
+      - yum-utils
+      - audit
+      - unzip
+      - device-mapper-persistent-data
+      - lvm2
+      - epel-release
+      - python3
+      - python3-pip
+      - python3-setuptools
+      - libselinux-python3
+      - git-{{ git_version }}
+      - docker-ce-{{ docker_ce_version }}
+      - docker-ce-cli-{{ docker_ce_cli_version }}
+      - containerd.io-{{ containerd_io_version }}
+      - wget
+      - nload
+      - net-tools
+  environment:
+    http_proxy: "{{ proxy_server }}"
+    https_proxy: "{{ proxy_server }}"
+
+- name: "Use python3"
+  set_fact: ansible_python_interpreter=/usr/bin/python3
+
+- name: "Install pip packages"
+  pip:
+    name: "{{ packages }}"
+    executable: pip3
+  vars:
+    packages:
+      - cryptography == {{ python_cryptography_version }}
+      - psycopg2-binary == {{ python_psycopg2_binary_version }}
+      - docker-compose == {{ docker_compose_version }}
+  environment:
+    http_proxy: "{{ proxy_server }}"
+    https_proxy: "{{ proxy_server }}"

@@ -1,0 +1,8 @@
+---
+- name: "Get rid of warning: setlocale: LC_CTYPE: cannot change locale (UTF-8)"
+  blockinfile:
+    path: /etc/environment
+    block: |
+      LANG=en_US.utf-8
+      LC_ALL=en_US.utf-8
+

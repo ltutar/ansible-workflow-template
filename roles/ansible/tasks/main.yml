@@ -1,0 +1,46 @@
+---
+- name: "Use python3"
+  set_fact: ansible_python_interpreter=/usr/bin/python3
+
+- name: "Create ansible group"
+  group:
+    name: ansible
+    state: present
+
+# ansible % ansible all -i localhost, -m debug -a "msg={{ 'password' | password_hash('sha512', 'mysecretsalt') }}"
+# see ansible_user_password in ansible/playbooks/group_vars/all/vault
+- name: "Create ansible user"
+  user:
+    name: ansible
+    group: ansible
+    password: "{{ ansible_user_encrypted_password }}"
+    home: /home/ansible
+
+- name: "Enable Password Authentication for Vagrant"
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    state: present
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication yes'
+  notify: restart sshd
+  when:
+     - server_env == "local"
+
+- name: "Create file /etc/sudoers.d/ansible for Vagrant"
+  file:
+    path: "/etc/sudoers.d/ansible"
+    state: touch
+    mode: '0440'
+  when:
+     - server_env == "local"
+
+- name: "Enable sudo for user ansible for Vagrant"
+  lineinfile:
+    path: /etc/sudoers.d/ansible
+    state: present
+    line: '%ansible ALL=(ALL) NOPASSWD: ALL'
+  when:
+     - server_env == "local"
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  meta: flush_handlers

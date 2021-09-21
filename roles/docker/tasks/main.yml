@@ -1,0 +1,80 @@
+---
+- name: "Use python3"
+  set_fact: ansible_python_interpreter=/usr/bin/python3
+
+- name: "Install docker requests"
+  pip:
+    name: docker, requests
+    executable: pip3
+  environment:
+    http_proxy: "{{ proxy_server }}"
+    https_proxy: "{{ proxy_server }}"
+
+- name: "Create docker config directories"
+  file:
+    path: "{{ dirs }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /etc/docker
+    - /etc/systemd/system/docker.service.d
+  loop_control:
+    loop_var: dirs
+
+- name: "Copy templatized docker service config"
+  template:
+    src: "docker-service.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/docker-service.conf"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart docker
+
+- name: "Create docker daemon config"
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart docker
+
+- name: "Create docker user and group"
+  user:
+    name: docker
+    group: docker
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+
+- name: "Add docker audit rules"
+  template:
+    src: docker.rules.j2
+    dest: /etc/audit/rules.d/docker.rules
+    owner: root
+    group: root
+    mode: 0600
+  notify: load docker audit rules
+
+- name: "Copy templatized http proxy"
+  template:
+    src: "http-proxy.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/http-proxy.conf"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart docker
+  when: server_env != "local"
+
+- name: "Force all notified handlers to run at this point, not waiting for normal sync points"
+  meta: flush_handlers
+
+- name: "Start default container hello-world to test docker installation"
+  docker_container:
+    name: hello-world
+    image: hello-world
+    container_default_behavior: no_defaults
+    tls_hostname: localhost
+    auto_remove: yes
