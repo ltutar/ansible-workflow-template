@@ -10,7 +10,7 @@ postgres_group
 [multi:vars]
 ansible_port=22
 ansible_user=vagrant
-ansible_private_key_file=~/.vagrant.d/insecure_private_key
+#ansible_private_key_file=~/.vagrant.d/insecure_private_key
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 
