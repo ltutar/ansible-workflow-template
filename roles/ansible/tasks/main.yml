@@ -16,31 +16,5 @@
     password: "{{ ansible_user_encrypted_password }}"
     home: /home/ansible
 
-- name: "Enable Password Authentication for Vagrant"
-  lineinfile:
-    path: "/etc/ssh/sshd_config"
-    state: present
-    regexp: '^PasswordAuthentication'
-    line: 'PasswordAuthentication yes'
-  notify: restart sshd
-  when:
-     - server_env == "local"
-
-- name: "Create file /etc/sudoers.d/ansible for Vagrant"
-  file:
-    path: "/etc/sudoers.d/ansible"
-    state: touch
-    mode: '0440'
-  when:
-     - server_env == "local"
-
-- name: "Enable sudo for user ansible for Vagrant"
-  lineinfile:
-    path: /etc/sudoers.d/ansible
-    state: present
-    line: '%ansible ALL=(ALL) NOPASSWD: ALL'
-  when:
-     - server_env == "local"
-
 - name: Force all notified handlers to run at this point, not waiting for normal sync points
   meta: flush_handlers
