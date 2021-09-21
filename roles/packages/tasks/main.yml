@@ -33,7 +33,7 @@
     update_cache: yes
   vars:
     packages:
-      - vimmm
+      - vim
       - yum
       - yum-utils
       - audit
